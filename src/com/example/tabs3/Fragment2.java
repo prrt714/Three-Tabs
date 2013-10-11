@@ -49,6 +49,9 @@ public class Fragment2 extends SupportMapFragment implements LocationListener {
 		}
 		Location location = locationManager.getLastKnownLocation(provider);
 		if (location != null) {
+			getMap().moveCamera(
+					CameraUpdateFactory.newLatLng(new LatLng(location
+							.getLatitude(), location.getLongitude())));
 			onLocationChanged(location);
 		}
 		getMap().moveCamera(CameraUpdateFactory.zoomTo(15));
@@ -69,7 +72,7 @@ public class Fragment2 extends SupportMapFragment implements LocationListener {
 		double latitude = arg0.getLatitude();
 		double longitude = arg0.getLongitude();
 		LatLng latLng = new LatLng(latitude, longitude);
-		getMap().moveCamera(CameraUpdateFactory.newLatLng(latLng));
+		// getMap().moveCamera(CameraUpdateFactory.newLatLng(latLng));
 		getMap().addMarker(
 				new MarkerOptions().position(latLng).icon(
 						BitmapDescriptorFactory
