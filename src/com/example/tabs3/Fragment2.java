@@ -1,5 +1,6 @@
 package com.example.tabs3;
 
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,10 +16,18 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class Fragment2 extends SupportMapFragment implements LocationListener {
 
+	LocationManager locationManager;
+
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		init();
 		super.onActivityCreated(savedInstanceState);
+	}
+
+	@Override
+	public void onDestroy() {
+		locationManager.removeUpdates(this);
+		super.onDestroy();
 	}
 
 	private void init() {
@@ -27,24 +36,37 @@ public class Fragment2 extends SupportMapFragment implements LocationListener {
 		settings.setMyLocationButtonEnabled(true);
 
 		/*
-		 * Commented lines to hide radius (this will automatically turns off GPS mode)
-		 * You also should replace LocationManager.GPS_PROVIDER with provider. 
-		*/
-		//getMap().setMyLocationEnabled(true);
+		 * Commented line to hide radius
+		 * mode)
+		 */
+		// getMap().setMyLocationEnabled(true);
 
-		LocationManager locationManager = (LocationManager) getActivity()
-				.getSystemService(getActivity().LOCATION_SERVICE);
-//		Criteria criteria = new Criteria();
-//		String provider = locationManager.getBestProvider(criteria, true);
-		Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		locationManager = (LocationManager) getActivity().getSystemService(
+				getActivity().LOCATION_SERVICE);
+		Location location = null;
+		String provider = LocationManager.GPS_PROVIDER;
+		if (!locationManager.isProviderEnabled(provider)) {
+			Criteria criteria = new Criteria();
+			provider = locationManager.getBestProvider(criteria, true);
+		}
+		location = locationManager.getLastKnownLocation(provider);
 		double latitude = location.getLatitude();
 		double longitude = location.getLongitude();
 		LatLng latLng = new LatLng(latitude, longitude);
 		getMap().moveCamera(CameraUpdateFactory.newLatLng(latLng));
+		getMap().moveCamera(CameraUpdateFactory.zoomTo(15));
 		if (location != null) {
 			onLocationChanged(location);
 		}
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 20000, 0, this);
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			locationManager.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER, 5000, 0, this);
+		}
+		if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+			locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 10000, 0, this);
+		}
+
 	}
 
 	@Override
@@ -54,7 +76,6 @@ public class Fragment2 extends SupportMapFragment implements LocationListener {
 		double longitude = arg0.getLongitude();
 		LatLng latLng = new LatLng(latitude, longitude);
 		getMap().moveCamera(CameraUpdateFactory.newLatLng(latLng));
-		getMap().animateCamera(CameraUpdateFactory.zoomTo(15));
 		getMap().addMarker(
 				new MarkerOptions().position(latLng).icon(
 						BitmapDescriptorFactory
