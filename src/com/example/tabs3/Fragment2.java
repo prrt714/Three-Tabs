@@ -36,28 +36,22 @@ public class Fragment2 extends SupportMapFragment implements LocationListener {
 		settings.setMyLocationButtonEnabled(true);
 
 		/*
-		 * Commented line to hide radius
-		 * mode)
+		 * Commented line to hide radius mode)
 		 */
 		// getMap().setMyLocationEnabled(true);
 
 		locationManager = (LocationManager) getActivity().getSystemService(
 				getActivity().LOCATION_SERVICE);
-		Location location = null;
 		String provider = LocationManager.GPS_PROVIDER;
 		if (!locationManager.isProviderEnabled(provider)) {
 			Criteria criteria = new Criteria();
 			provider = locationManager.getBestProvider(criteria, true);
 		}
-		location = locationManager.getLastKnownLocation(provider);
-		double latitude = location.getLatitude();
-		double longitude = location.getLongitude();
-		LatLng latLng = new LatLng(latitude, longitude);
-		getMap().moveCamera(CameraUpdateFactory.newLatLng(latLng));
-		getMap().moveCamera(CameraUpdateFactory.zoomTo(15));
+		Location location = locationManager.getLastKnownLocation(provider);
 		if (location != null) {
 			onLocationChanged(location);
 		}
+		getMap().moveCamera(CameraUpdateFactory.zoomTo(15));
 		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			locationManager.requestLocationUpdates(
 					LocationManager.GPS_PROVIDER, 5000, 0, this);
